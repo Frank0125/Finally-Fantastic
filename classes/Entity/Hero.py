@@ -1,4 +1,5 @@
 import copy
+import random
 from .Stats import Stats, HeroStats
 from abc import ABC, abstractmethod
 
@@ -24,6 +25,9 @@ class Prototype(ABC):
 
     @abstractmethod
     def attack(self):
+        pass
+
+    def getName(self):
         pass
          
 # region Enemy 
@@ -51,6 +55,9 @@ class Enemy(Prototype):
     def attack(self):
         return 1 * self.stats.strength
 
+    def getName(self):
+        return self.stats.name
+    
 class EnemySpawner:
     def __init__(self, prototype: Enemy):
         self.prototype = prototype
@@ -63,6 +70,9 @@ class EnemySpawner:
 # region Hero
 class Hero(Prototype):
     # * El heroe usa Decorator por lo que no tiene constructor en su base
+    def __init__(self, stats : Stats, heroStats : HeroStats):
+        self.stats = stats
+        self.heroStats = heroStats
 
     def clone(self, deep: bool = True):
         pass
@@ -75,8 +85,14 @@ class Hero(Prototype):
 
     def takeDamage(self, hit : int):    
         pass
+
+    def getName(self):
+        return self.stats.name
     
-    #* Este sería el heroe más basico que hay
+    def getStatus(self):
+        print(f"{self.getName} \n --------------------\nHP: {self.stats.hp} MANA: {self.heroStats.mana}")
+    
+#* Este sería el heroe más basico que hay
 class ConcreteHero(Hero):
     def __init__(self, stats : Stats, heroStats : HeroStats):
         self.stats = stats
@@ -92,9 +108,11 @@ class ConcreteHero(Hero):
         self.stats.hp = 0
         print(f"{self.stats.name} has perished. One party member less... \n")
         input() #! dramatic pause
-        print(f"{self.stats.name}: I trusted you. X_X")
+        print(f"{self.getName()}: I trusted you. X_X")
 
-    def takeDamage(self, hit : int):    
+    def takeDamage(self, hit : int):
+
+        print(f"{self.getName()} gets hit for {hit} damage \n")    
         self.stats.hp =- hit
 
         if self.stats.hp <= 0:
@@ -108,4 +126,120 @@ class ConcreteHero(Hero):
         
         return self.heroStats.attackStrategy()
     
+# endregion
+
+# region Decorators
+
+class DecoratorHero(Hero):
+    def __init__(self, hero : Hero):
+        self.hero = hero
+    
+    def clone(self, deep: bool = True):
+        pass
+
+    def encounter(self):
+        pass
+
+    def takeDamage(self, hit : int):    
+        pass
+
+    def attack(self):
+        pass
+
+    def getStatus(self):
+        pass
+
+class Rogue(DecoratorHero):
+    def clone(self, deep: bool = True):
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
+    def encounter(self):
+        print("CLASS: Swordsman \n")
+        self.hero.encounter()
+
+
+    def takeDamage(self, hit : int):
+        if (random.randint(1,5) == 5):
+            print(f"{self.hero.getName()} dodged the attack!")
+
+        multiplier = 1.3
+        newHit = round(multiplier * hit)
+        print(newHit)
+        self.hero.takeDamage(newHit) 
+
+    def attack(self):
+        chance = random.randint(1,5)
+        if chance == 3:
+            print(f"{self.hero.getName()} hits a CRIT, X2 Damage")
+            return self.attack() * 2
+        
+        elif chance == 5:
+            print(f"{self.hero.getName()} whiffs thier attack dealing 0 damage!")
+            return 0
+        
+        return self.hero.attack()
+    
+    def getStatus(self):
+        self.hero.getStatus()
+
+class Mage(DecoratorHero):
+    def clone(self, deep: bool = True):
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
+    def encounter(self):
+        print("CLASS: Mage \n")
+        self.hero.encounter()
+
+    def takeDamage(self, hit : int):
+        multiplier = 1.7
+        newHit = round(multiplier * hit)
+        if (random.randint(1, 10) == 10):
+            print(f"{self.hero.getName()} tripped! Gets hit with a CRIT X2 damage")
+            self.hero.takeDamage()
+
+        self.hero.takeDamage(newHit) 
+        self.heroStats.mana =+ hit/2
+
+        print(f"{self.getName} recovers {hit/2} mana")
+
+    def attack(self):
+        chance = random.randint(1, 5)
+        damage = self.attack()
+        if chance == 5:
+            print(f"{self.hero.getName()} life steals the enemy, damage dealt also healed")
+            self.hero.stats =+ damage
+            return damage
+
+        elif chance == 3:
+            print(f"{self.hero.getName()} overstepped! Gets braced by their own attack!")
+            self.hero.takeDamage(damage)
+            return damage
+        
+        return self.hero.attack()
+    
+    def getStatus(self):
+        self.hero.getStatus()
+
+class Tank(DecoratorHero):
+    def clone(self, deep: bool = True):
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
+    def encounter(self):
+        print("CLASS: Tank \n")
+        self.hero.encounter()
+
+    def takeDamage(self, hit : int):
+        multiplier = 0.5
+        newHit = round(multiplier * hit)
+        if (random.randint(1, 100) == 100):
+            print(f"{self.hero.getName()} got a heart attack, they die")
+            self.hero.perish()
+
+        self.hero.takeDamage(newHit)
+
+    def attack(self):
+        return round(self.hero.attack() * 0.7)
+    
+    def getStatus(self):
+        self.hero.getStatus()
 # endregion

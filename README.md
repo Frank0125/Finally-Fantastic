@@ -1,7 +1,9 @@
 # Finally Fantastic - Python RPG
 
 ### To run this project you should do the following commands
-
+```shell
+python -m venv venv
+```
 ```shell
 venv/Scripts/activate
 ```
@@ -40,17 +42,24 @@ classDiagram
     }
 
     class Prototype {
-	    +Prototype clone()
+	    + Prototype clone()
+        + void perish()
+        + void takeDamage()
+        + int attack()
     }
 
     class Hero {
-        - int mana
-	    - AttackStrategy attackStrategy
-        - void setAttackStrategy(AttackStrategy)
+        + void encounter()
+        + void perish()
+        + void takeDamage()
+        + void setAttackStrategy(AttackStrategy)
+        + int attack()
     }
 
     class AttackStrategy {
+        - int manaCost
 	    + attack()
+       + getManaCost()
     }
 
     class LightStrategy {
@@ -66,8 +75,13 @@ classDiagram
     }
 
     class ConcreteHero {
-	    - Stats raw_stats
-	    - attackStrategy
+        - HeroStats herosStats
+        - Stats stats
+        + void encounter()
+        + void perish()
+        + void takeDamage()
+        + void setAttackStrategy(AttackStrategy)
+        + int attack()
 	    + Hero clone()
     }
 
@@ -83,6 +97,9 @@ classDiagram
     class Enemy {
 	    - Stats raw_stats
 	    + regularAttack()
+        + void encounter()
+        + void perish()
+        + void takeDamage()
 	    + Enemy clone()
     }
 
@@ -105,12 +122,18 @@ classDiagram
 	    -int speed
     }
 
+    class HeroStats {
+        - int mana 
+        - AttackStrategy attackstrategy
+    }
+
     %% Composición
     HeroDecorator --> Hero
-    Hero --> Stats
+    
     Enemy --> Stats
     Spawner --> Prototype
-    Hero --> AttackStrategy
+    ConcreteHero --> HeroStats
+    ConcreteHero --> Stats
 
     %% Herencia
     UpCommand ..|> Command

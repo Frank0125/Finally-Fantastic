@@ -3,10 +3,13 @@
 ### To run this project you should do the following commands
 
 ```shell
-venv\bin\activate
+venv/Scripts/activate
 ```
 ```shell
 pip install -r requirements.txt
+```
+```shell
+python main.py
 ```
 
 ## This project uses the following Design Patterns:

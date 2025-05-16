@@ -14,87 +14,116 @@ python main.py
 
 ## This project uses the following Design Patterns:
 
-- Creational Pattern: 
-- Structural Pattern:
-- Comportamiento Pattern: 
-- Extra Pattern (Type): 
+- Creational Pattern: **Prototype**
+- Structural Pattern: **Decorator**
+- Behavioral Pattern: **Strategy**
+- Extra Pattern (Behavioral): **Command**
 
 ## UML created in mermaid:
 
-
 ```mermaid
 classDiagram
-class Casilla {
-  #int numero
-  #int premio_castigo
-  #string tipo
-  +CCasilla()
-  +CCasilla(int,string)
-  +int getNumeroCasilla()
-  +string getTipo()
-  +int getSiguienteCasilla()
-  +void print()
-}
+    class Command {
+        + execute()
+    }
 
-class Normal {
-  +CasillaNormal()
-  +CasillaNormal(int)
-}
-Casilla <|-- Normal
+    class UpCommand {
+        + execute()
+    }
 
-class Escalera {
-  +CasillaEscalera()
-  +CasillaEscalera(int)
-}
-Casilla <|-- Escalera
+    class DownCommand {
+        + execute()
+    }
+    
+    class SelectCommand {
+        + execute()
+    }
 
-class Serpiente {
-  +CasillaSerpiente()
-  +CasillaSerpiente(int)
-}
-Casilla <|-- Serpiente
+    class Prototype {
+	    +Prototype clone()
+    }
 
-class Tablero {
-  -CCasilla c
-  +Tablero()
-  +Tablero(string)
-  +void setCasilla(CCasilla,int)
-  +CCasilla getCasilla(int)
-  +void print()
-}
+    class Hero {
+        - int mana
+	    - AttackStrategy attackStrategy
+        - void setAttackStrategy(AttackStrategy)
+    }
 
-class Jugador {
-  #int numero
-  #int casilla_actual
-  +Jugador()
-  +Jugador(int)
-  +int getCasilla_actual()
-  +void setCasilla_actual(int)
-  +void print()
-}
+    class AttackStrategy {
+	    + attack()
+    }
 
-class Dado {
-  -bool switchrandom
-  +int cara
-  +CDado()
-  +CDado(bool)
-  +int getValorDado()
-}
+    class LightStrategy {
+	    + attack()
+    }
 
-class Game {
-  -Tablero t
-  -Jugador j
-  -CDado d
-  -bool swio 
-  +Game()
-  +Game(string,bool,bool)
-  +void start()
-  +void outMsg(string)
-}
+    class MidStrategy {
+	    + attack()
+    }
 
-Game --> Tablero : tiene
-Game --> Jugador : tiene 2
-Game --> Dado : tiene 1
-Tablero --> Casilla : tiene 30
+    class HeavyStrategy {
+	    + attack()
+    }
 
+    class ConcreteHero {
+	    - Stats raw_stats
+	    - attackStrategy
+	    + Hero clone()
+    }
+
+    class HeroDecorator {
+	    - Hero hero
+	    - attackStrategy
+    }
+
+    class ConcreteHeroDecorator {
+	    - attackStrategy
+    }
+
+    class Enemy {
+	    - Stats raw_stats
+	    + regularAttack()
+	    + Enemy clone()
+    }
+
+    class Spawner {
+	    - Prototype entity_blueprint
+	    - spawnEntity()
+    }
+
+    class EnemySpawner {
+	    + Enemy spawnEntity()
+    }
+
+    class HeroSpawner {
+	    +Hero spawnEntity()
+    }
+
+    class Stats {
+	    -string name
+	    -int hp
+	    -int speed
+    }
+
+    %% Composición
+    HeroDecorator --> Hero
+    Hero --> Stats
+    Enemy --> Stats
+    Spawner --> Prototype
+    Hero --> AttackStrategy
+
+    %% Herencia
+    UpCommand ..|> Command
+    DownCommand ..|> Command
+    SelectCommand ..|> Command
+    LightStrategy ..|> AttackStrategy
+    MidStrategy ..|> AttackStrategy
+    HeavyStrategy ..|> AttackStrategy
+    ConcreteHero ..|> Hero
+    HeroDecorator ..|> Hero
+    Hero ..|> Prototype
+    ConcreteHeroDecorator ..|> HeroDecorator
+    Enemy ..|> Prototype
+    EnemySpawner ..|> Spawner
+    HeroSpawner ..|> Spawner
 ```

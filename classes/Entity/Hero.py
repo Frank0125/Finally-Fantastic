@@ -237,7 +237,7 @@ class Mage(DecoratorHero):
             stdscr.addstr(f"{self.hero.getName()} overstepped! Gets braced by their own attack!")
             self.hero.takeDamage(damage, stdscr)
             return damage
-        
+        stdscr.getch()
         return damage
 
 class Tank(DecoratorHero):

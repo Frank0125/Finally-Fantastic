@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class Command(ABC):
     @abstractmethod
-    def execute(func):
+    def execute(self):
         pass
 
 class Controller:

@@ -7,19 +7,20 @@ from game import game
 from classes.Command.Command import Command as ClassCommand, Controller
 
 class GoUp(ClassCommand):
-    def execute():
+    def execute(self):
         global selected
+        global options
         selected = (selected - 1) % len(options)
 
 class GoDown(ClassCommand):
-
-    def execute():
+    def execute(self):
         global selected
         selected = (selected + 1) % len(options)
 
 class Confirm(ClassCommand):
-    def execute():
+    def execute(self):
         print("Thank You")
+
 
 
 # region Main
@@ -28,9 +29,9 @@ class Confirm(ClassCommand):
 # region Controllers
 PlayerController = Controller()
 
-PlayerController.asignCommand("up", GoUp)
-PlayerController.asignCommand("down", GoDown)
-PlayerController.asignCommand("enter", Confirm)
+PlayerController.asignCommand("up", GoUp())
+PlayerController.asignCommand("down", GoDown())
+PlayerController.asignCommand("enter", Confirm())
 
 selected = 0
 options = ["Start Game", "Exit"]

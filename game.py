@@ -56,8 +56,8 @@ mage.hero.stats.name = "Nitro"
 tank.hero.stats.name = "America"
 
 # region Main
-selected = 0
-attackOptions = ["Last Option", "Heavy", "Mid", "Light"]
+selected = 1
+options = ["Last Option", "Heavy", "Mid", "Light"]
 party : List[DecoratorHero] = [rogue, mage, tank]
 
 
@@ -105,7 +105,7 @@ def attackMenu(stdscr, key_scheme, PlayerController, enemies : List[Enemy]):
             break
         stdscr.clear()
         stdscr.addstr(0, 0, f"=== {randomHero.hero.getName()}'s turn -- Attack! ===")
-        for i, option in enumerate(attackOptions):
+        for i, option in enumerate(options):
             prefix = "> " if i == selected else "  "
             stdscr.addstr(i + 1, 0, f"{prefix}{option}")
         stdscr.refresh()
@@ -127,26 +127,33 @@ def attackMenu(stdscr, key_scheme, PlayerController, enemies : List[Enemy]):
             PlayerController.pressButton("enter")
             break
 
-    stdscr.clear()
-    if selected == 3:
-        this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr))
+        stdscr.clear()
 
-    elif selected == 2:
-        stdscr.addstr(0, 0, f"Heavy Selected, now is last choice")
-        randomHero.hero.heroStats.attackStrategy = HeavyAttack()
-        this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr), stdscr
-                                                                )
+        if selected == 3:
+            stdscr.clear()
+            stdscr.addstr(0, 0, f"Using last attack")
+            this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr))
 
-    elif selected == 1:
-        stdscr.addstr(0, 0, f"Mid")
-        randomHero.hero.heroStats.attackStrategy = MidAttack()
-        this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr), stdscr)
+        elif selected == 2:
+            stdscr.clear()
+            stdscr.addstr(0, 0, f"Heavy Selected, now is last choice")
+            randomHero.hero.heroStats.attackStrategy = HeavyAttack()
+            this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr), stdscr
+                                                                    )
 
-    elif selected == 0:
-        stdscr.addstr(0, 0, f"Light")
-        randomHero.hero.heroStats.attackStrategy = LightAttack()
-        this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr), stdscr)
+        elif selected == 1:
+            stdscr.clear()
+            stdscr.addstr(0, 0, f"Mid")
+            randomHero.hero.heroStats.attackStrategy = MidAttack()
+            this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr), stdscr)
 
+        elif selected == 0:
+            stdscr.clear()
+            stdscr.addstr(0, 0, f"Light")
+            randomHero.hero.heroStats.attackStrategy = LightAttack()
+            this_enemies[random.randint(0, len(this_enemies) - 1)].takeDamage(randomHero.attack(stdscr), stdscr)
+
+    
     randomHero.takeDamage(this_enemies[random.randint(0, len(this_enemies) - 1)].attack(stdscr), stdscr)
     stdscr.refresh()
     stdscr.getch()
@@ -179,6 +186,6 @@ def game(stdscr, key_scheme, PlayerController):
     stdscr.keypad(True)
     enemies = shallowGoblins
     global party
-    while any(e.stats.hp > 0 for e in enemies): #! its reading hp as tuple???
+    while any(e.stats.hp > 0 for e in enemies): 
         story(stdscr, key_scheme, PlayerController, party, enemies)
         stdscr.clear()

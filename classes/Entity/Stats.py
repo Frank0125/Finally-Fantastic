@@ -3,7 +3,7 @@ from .AttackStrategy import AttackStrategy
 class Stats:
     def __init__(self, name : str, hp : int, speed : int, strength : int):
         self.name = name
-        self.hp = hp,
+        self.hp = hp #! it was a coma, istg
         self.speed = speed
         self.strength = strength
 

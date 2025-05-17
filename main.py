@@ -61,6 +61,7 @@ def getInputScheme(stdscr):
 
 # Main menu loop with curses
 def main(stdscr):
+    global PlayerController
     curses.curs_set(0)
     stdscr.nodelay(False)
     stdscr.keypad(True)

@@ -37,7 +37,7 @@ classDiagram
         + execute()
     }
     
-    class SelectCommand {
+    class EnterCommand {
         + execute()
     }
 
@@ -138,7 +138,7 @@ classDiagram
     %% Herencia
     UpCommand ..|> Command
     DownCommand ..|> Command
-    SelectCommand ..|> Command
+    EnterCommand ..|> Command
     LightStrategy ..|> AttackStrategy
     MidStrategy ..|> AttackStrategy
     HeavyStrategy ..|> AttackStrategy

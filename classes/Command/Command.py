@@ -5,22 +5,6 @@ class Command(ABC):
     def execute(func):
         pass
 
-
-class UpCommand(Command):
-    def execute(func):
-        func()
-
-
-class DownCommand(Command):
-    def execute(func):
-        func()
-
-
-class SelectCommand(Command):
-    def execute(func):
-        func()
-
-
 class Controller:
     def __init__(self):
         self.buttons = {}
@@ -34,3 +18,5 @@ class Controller:
             command.execute()
         else:
             print(f"No command when pressing {buttonName}")
+
+__all__ = ['Command', 'Controller']

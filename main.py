@@ -1,14 +1,10 @@
-import keyboard
-import os
-import time
 import curses
+
+from game import game
 
 #! Classes implemented Command
 #* Command
 from classes.Command.Command import Command as ClassCommand, Controller
-#* Entity
-from classes.Entity.AttackStrategy import HeavyAttack, MidAttack, LightAttack  # Update if necessary
-from classes.Entity.Hero import Enemy, EnemySpawner, ConcreteHero, DecoratorHero, Rogue, Mage, Tank
 
 class GoUp(ClassCommand):
     def execute():
@@ -23,7 +19,7 @@ class GoDown(ClassCommand):
 
 class Confirm(ClassCommand):
     def execute():
-        print("OK")
+        print("Thank You")
 
 
 # region Main
@@ -61,6 +57,7 @@ def getInputScheme(stdscr):
             stdscr.addstr(5, 0, "Invalid option, press 1 or 2")
             stdscr.refresh()
             curses.napms(1000)
+        
 
 # Main menu loop with curses
 def main(stdscr):
@@ -95,19 +92,17 @@ def main(stdscr):
                 PlayerController.pressButton("down")
 
         if key == ord("\n"):
-            PlayerController.pressButton("up")
+            # PlayerController.pressButton("enter")
             break
 
-    stdscr.clear()
     if selected==1:
-        stdscr.addstr(0, 0, f"Starting Game...")
+        stdscr.addstr(0, 0, f"Exiting...")
+
+    stdscr.addstr(0, 0, f"Exiting...")
 
     if selected==0:
-        stdscr.addstr(0, 0, f"Exiting...")
-    stdscr.refresh()
-    stdscr.getch()
-
-    
+        stdscr.addstr(0, 0, f"Starting Game...")
+        game(stdscr, key_scheme, PlayerController)
 
 # Start 
 curses.wrapper(main)

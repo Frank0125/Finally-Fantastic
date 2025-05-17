@@ -1,6 +1,7 @@
 import copy
 import random
 from .Stats import Stats, HeroStats
+from .AttackStrategy import AttackStrategy
 from abc import ABC, abstractmethod
 
 #! In this file both Hero and Enemy are declared and defined 
@@ -73,7 +74,7 @@ class Hero(Prototype):
     def __init__(self, stats : Stats, heroStats : HeroStats):
         self.stats = stats
         self.heroStats = heroStats
-
+        
     def clone(self, deep: bool = True):
         pass
 
@@ -91,6 +92,9 @@ class Hero(Prototype):
     
     def getStatus(self):
         print(f"{self.getName} \n --------------------\nHP: {self.stats.hp} MANA: {self.heroStats.mana}")
+
+    def setAttackStrategy(self, attackStrategy : AttackStrategy):
+        self.heroStats.attackStrategy = attackStrategy
     
 #* Este sería el heroe más basico que hay
 class ConcreteHero(Hero):
@@ -171,13 +175,13 @@ class Rogue(DecoratorHero):
         chance = random.randint(1,5)
         if chance == 3:
             print(f"{self.hero.getName()} hits a CRIT, X2 Damage")
-            return self.attack() * 2
+            return self.attack() * self.hero.stats.speed/2
         
         elif chance == 5:
             print(f"{self.hero.getName()} whiffs thier attack dealing 0 damage!")
             return 0
         
-        return self.hero.attack()
+        return self.hero.attack() * 1.3
     
     def getStatus(self):
         self.hero.getStatus()

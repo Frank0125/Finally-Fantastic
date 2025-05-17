@@ -95,14 +95,20 @@ def main(stdscr):
             # PlayerController.pressButton("enter")
             break
 
-    if selected==1:
-        stdscr.addstr(0, 0, f"Exiting...")
+    if selected == 1:
+        stdscr.clear()
+        stdscr.addstr(0, 0, "Exiting...")
+        stdscr.refresh()
+        curses.napms(1000)
+        return  # Final
 
-    stdscr.addstr(0, 0, f"Exiting...")
-
-    if selected==0:
-        stdscr.addstr(0, 0, f"Starting Game...")
+    elif selected == 0:
+        stdscr.clear()
+        stdscr.addstr(0, 0, "Starting Game...")
+        stdscr.refresh()
+        curses.napms(1000)
         game(stdscr, key_scheme, PlayerController)
+
 
 # Start 
 curses.wrapper(main)

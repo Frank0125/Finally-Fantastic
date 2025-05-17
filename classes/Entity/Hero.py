@@ -13,237 +13,238 @@ class Prototype(ABC):
         pass
 
     @abstractmethod
-    def encounter(self):
+    def encounter(self, stdscr):
         pass
 
     @abstractmethod
-    def perish(self):
+    def perish(self, stdscr):
         pass
 
     @abstractmethod
-    def takeDamage(self, hit : int):
+    def takeDamage(self, hit: int, stdscr):
         pass
 
     @abstractmethod
-    def attack(self):
+    def attack(self, stdscr):
         pass
 
     def getName(self):
         pass
-         
+
 # region Enemy 
 class Enemy(Prototype):
-    def __init__(self, stats : Stats):
+    def __init__(self, stats: Stats):
         self.stats = stats
 
     def clone(self, deep: bool = True):
         return copy.deepcopy(self) if deep else copy.copy(self)
 
-    def encounter(self):
-        print(f"An enemy has a started a battle with your party.\n NAME: {self.stats.name} HP: {self.stats.hp} \n")
+    def encounter(self, stdscr):
+        stdscr.addstr(f"An enemy has a started a battle with your party.\n NAME: {self.stats.name} HP: {self.stats.hp} \n")
+        stdscr.refresh()
 
-    def perish(self):
+    def perish(self, stdscr):
         self.stats.hp = 0
-        print(f"{self.stats.name} has been defeated. \n")
+        stdscr.addstr(f"{self.stats.name} has been defeated. \n")
+        stdscr.refresh()
 
-    def takeDamage(self, hit : int):    
-        self.stats.hp =- hit
-
+    def takeDamage(self, hit: int, stdscr):
+        self.stats.hp -= hit
         if self.stats.hp <= 0:
-            self.perish()
+            self.perish(stdscr)
 
-    #* An enemy deals its raw strength atribute as damage
-    def attack(self):
+    def attack(self, stdscr):
         return 1 * self.stats.strength
 
     def getName(self):
         return self.stats.name
-    
+
+# Clase para crear enemigos a partir de un prototipo base
 class EnemySpawner:
     def __init__(self, prototype: Enemy):
         self.prototype = prototype
 
     def spawn_enemy(self, deep: bool = True):
         return self.prototype.clone(deep=deep)
-    
-# endregion
 
 # region Hero
 class Hero(Prototype):
-    # * El heroe usa Decorator por lo que no tiene constructor en su base
-    def __init__(self, stats : Stats, heroStats : HeroStats):
+    def __init__(self, stats: Stats, heroStats: HeroStats):
         self.stats = stats
         self.heroStats = heroStats
-        
+
     def clone(self, deep: bool = True):
         pass
 
-    def encounter(self):
+    def encounter(self, stdscr):
         pass
 
-    def perish(self):
-       pass
+    def perish(self, stdscr):
+        pass
 
-    def takeDamage(self, hit : int):    
+    def takeDamage(self, hit: int, stdscr):
         pass
 
     def getName(self):
         return self.stats.name
-    
-    def getStatus(self):
-        print(f"{self.getName} \n --------------------\nHP: {self.stats.hp} MANA: {self.heroStats.mana}")
+
+    def getStatus(self, stdscr):
+        stdscr.addstr(f"{self.getName()} \n --------------------\nHP: {self.stats.hp} MANA: {self.heroStats.mana}\n")
+        stdscr.refresh()
 
     def setAttackStrategy(self, attackStrategy : AttackStrategy):
         self.heroStats.attackStrategy = attackStrategy
-    
+
 #* Este sería el heroe más basico que hay
 class ConcreteHero(Hero):
-    def __init__(self, stats : Stats, heroStats : HeroStats):
+    def __init__(self, stats: Stats, heroStats: HeroStats):
         self.stats = stats
         self.heroStats = heroStats
 
     def clone(self, deep: bool = True):
         return copy.deepcopy(self) if deep else copy.copy(self)
 
-    def encounter(self):
-        print(f"NAME: {self.stats.name} HP: {self.stats.hp} STR: {self.stats.strength} \n")
+    def encounter(self, stdscr):
+        stdscr.addstr(f"NAME: {self.stats.name} HP: {self.stats.hp} STR: {self.stats.strength} \n")
+        stdscr.refresh()
 
-    def perish(self):
+    def perish(self, stdscr):
         self.stats.hp = 0
-        print(f"{self.stats.name} has perished. One party member less... \n")
-        input() #! dramatic pause
-        print(f"{self.getName()}: I trusted you. X_X")
+        stdscr.addstr(f"{self.stats.name} has perished. One party member less... \n")
+        stdscr.refresh()
+        stdscr.getch() # dramatic pause
+        stdscr.addstr(f"{self.getName()}: I trusted you. X_X\n")
+        stdscr.refresh()
 
-    def takeDamage(self, hit : int):
-
-        print(f"{self.getName()} gets hit for {hit} damage \n")    
-        self.stats.hp =- hit
-
+    def takeDamage(self, hit: int, stdscr):
+        stdscr.addstr(f"{self.getName()} gets hit for {hit} damage \n")
+        stdscr.refresh()
+        self.stats.hp -= hit
         if self.stats.hp <= 0:
-            self.perish()
+            self.perish(stdscr)
 
     #* A Hero uses an attack strategy to eihter use a Heavy, Mid, or Light attack
-    def attack(self):
-        if (self.heroStats.mana < self.heroStats.attackStrategy.getManaCost()):
-            print("Not enough mana to attack with chosen attack")
+    def attack(self, stdscr):
+        if self.heroStats.mana < self.heroStats.attackStrategy.getManaCost():
+            stdscr.addstr("Not enough mana to attack with chosen attack\n")
+            stdscr.refresh()
             return 0
-        
         return self.heroStats.attackStrategy()
-    
-# endregion
 
 # region Decorators
-
 class DecoratorHero(Hero):
-    def __init__(self, hero : Hero):
+    def __init__(self, hero: Hero):
         self.hero = hero
-    
+
     def clone(self, deep: bool = True):
         pass
 
-    def encounter(self):
+    def encounter(self, stdscr):
         pass
 
-    def takeDamage(self, hit : int):    
+    def takeDamage(self, hit: int, stdscr):
         pass
 
-    def attack(self):
+    def attack(self, stdscr):
         pass
 
-    def getStatus(self):
+    def getStatus(self, stdscr):
         pass
 
+# Clase para los Rogue
 class Rogue(DecoratorHero):
     def clone(self, deep: bool = True):
         return copy.deepcopy(self) if deep else copy.copy(self)
 
-    def encounter(self):
-        print("CLASS: Swordsman \n")
-        self.hero.encounter()
+    def encounter(self, stdscr):
+        stdscr.addstr("CLASS: Swordsman \n")
+        stdscr.refresh()
+        self.hero.encounter(stdscr)
 
-
-    def takeDamage(self, hit : int):
-        if (random.randint(1,5) == 5):
-            print(f"{self.hero.getName()} dodged the attack!")
-
+    def takeDamage(self, hit: int, stdscr):
+        if random.randint(1, 5) == 5:
+            stdscr.addstr(f"{self.hero.getName()} dodged the attack!\n")
+            stdscr.refresh()
+            return
         multiplier = 1.3
         newHit = round(multiplier * hit)
-        print(newHit)
-        self.hero.takeDamage(newHit) 
+        stdscr.addstr(f"{newHit}\n")
+        stdscr.refresh()
+        self.hero.takeDamage(newHit, stdscr)
 
-    def attack(self):
-        chance = random.randint(1,5)
+    def attack(self, stdscr):
+        chance = random.randint(1, 5)
         if chance == 3:
-            print(f"{self.hero.getName()} hits a CRIT, X2 Damage")
-            return self.attack() * self.hero.stats.speed/2
-        
+            stdscr.addstr(f"{self.hero.getName()} hits a CRIT, X2 Damage\n")
+            stdscr.refresh()
+            return self.hero.attack(stdscr) * self.hero.stats.speed / 2
         elif chance == 5:
-            print(f"{self.hero.getName()} whiffs thier attack dealing 0 damage!")
+            stdscr.addstr(f"{self.hero.getName()} whiffs their attack dealing 0 damage!\n")
+            stdscr.refresh()
             return 0
-        
-        return self.hero.attack() * 1.3
-    
-    def getStatus(self):
-        self.hero.getStatus()
+        return self.hero.attack(stdscr) * 1.3
 
+    def getStatus(self, stdscr):
+        self.hero.getStatus(stdscr)
+
+# Clase para los Magos
 class Mage(DecoratorHero):
     def clone(self, deep: bool = True):
         return copy.deepcopy(self) if deep else copy.copy(self)
 
-    def encounter(self):
-        print("CLASS: Mage \n")
-        self.hero.encounter()
+    def encounter(self, stdscr):
+        stdscr.addstr("CLASS: Mage \n")
+        stdscr.refresh()
+        self.hero.encounter(stdscr)
 
-    def takeDamage(self, hit : int):
+    def takeDamage(self, hit: int, stdscr):
         multiplier = 1.7
         newHit = round(multiplier * hit)
-        if (random.randint(1, 10) == 10):
-            print(f"{self.hero.getName()} tripped! Gets hit with a CRIT X2 damage")
-            self.hero.takeDamage()
+        if random.randint(1, 10) == 10:
+            stdscr.addstr(f"{self.hero.getName()} tripped! Gets hit with a CRIT X2 damage\n")
+            stdscr.refresh()
+            self.hero.takeDamage(hit * 2, stdscr)
+        self.hero.takeDamage(newHit, stdscr)
+        self.hero.heroStats.mana += hit / 2
+        stdscr.addstr(f"{self.hero.getName()} recovers {hit / 2} mana\n")
+        stdscr.refresh()
 
-        self.hero.takeDamage(newHit) 
-        self.heroStats.mana =+ hit/2
-
-        print(f"{self.getName} recovers {hit/2} mana")
-
-    def attack(self):
+    def attack(self, stdscr):
         chance = random.randint(1, 5)
         damage = self.attack()
         if chance == 5:
-            print(f"{self.hero.getName()} life steals the enemy, damage dealt also healed")
+            stdscr.addstr(f"{self.hero.getName()} life steals the enemy, damage dealt also healed")
             self.hero.stats =+ damage
             return damage
 
         elif chance == 3:
-            print(f"{self.hero.getName()} overstepped! Gets braced by their own attack!")
-            self.hero.takeDamage(damage)
+            stdscr.addstr(f"{self.hero.getName()} overstepped! Gets braced by their own attack!")
+            self.hero.takeDamage(damage, stdscr)
             return damage
         
-        return self.hero.attack()
-    
-    def getStatus(self):
-        self.hero.getStatus()
+        return self.hero.attack(stdscr)
 
 class Tank(DecoratorHero):
     def clone(self, deep: bool = True):
         return copy.deepcopy(self) if deep else copy.copy(self)
 
-    def encounter(self):
-        print("CLASS: Tank \n")
-        self.hero.encounter()
+    def encounter(self, stdscr):
+        stdscr.addstr("CLASS: Tank \n")
+        stdscr.refresh()
+        self.hero.encounter(stdscr)
 
-    def takeDamage(self, hit : int):
+    def takeDamage(self, hit: int, stdscr):
         multiplier = 0.5
         newHit = round(multiplier * hit)
         if (random.randint(1, 100) == 100):
-            print(f"{self.hero.getName()} got a heart attack, they die")
+            stdscr.addstr(f"{self.hero.getName()} got a heart attack, they die")
+            stdscr.refresh()
             self.hero.perish()
 
-        self.hero.takeDamage(newHit)
+        self.hero.takeDamage(newHit, stdscr)
 
-    def attack(self):
-        return round(self.hero.attack() * 0.7)
+    def attack(self, stdscr):
+        return round(self.hero.attack(stdscr) * 0.7)
     
     def getStatus(self):
         self.hero.getStatus()
-# endregion

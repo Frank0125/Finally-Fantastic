@@ -8,17 +8,17 @@ random.seed(seed)
 
 #* Entity
 from classes.Entity.AttackStrategy import HeavyAttack, MidAttack, LightAttack
-from classes.Entity.HeroCopy import Prototype, Enemy, EnemySpawner, Hero, ConcreteHero, DecoratorHero, Rogue, Mage, Tank
+from classes.Entity.Hero import Prototype, Enemy, EnemySpawner, Hero, ConcreteHero, DecoratorHero, Rogue, Mage, Tank
 from classes.Entity.Stats import Stats, HeroStats
 
 # region Stats
 #! Phase 1 enemy stats
-atributesEnemies1 = Stats("Goblin",40, 4, 7)
+atributesEnemies1 = Stats("Goblin", 40, 4, 7)
 #! Phase 2 enemy stats
-atributesEnemies2 = Stats("The Twins",70, 9, 12)
+atributesEnemies2 = Stats("The Twins", 70, 9, 12)
 
 #! Boss (random stats)
-atributesBoss = Stats("John Evil",200, 12, 40)
+atributesBoss = Stats("John Evil", 200, 12, 40)
 atributesBossRandom = Stats("Rosephith",random.randint(1, 1000), random.randint(0, 100), random.randint(0, 100))
 
 #! Random player stats 0_0
@@ -56,7 +56,7 @@ tank.hero.stats.name = "America"
 # region Main
 selected = 0
 attackOptions = ["Last Option, Heavy, Mid, Light"]
-party = [rogue, mage, tank]
+party : List[Hero] = [rogue, mage, tank]
 
 
 def startEncounters(fullList : List[Union[Hero, Enemy]] ):
@@ -79,13 +79,13 @@ def createEncounterList(fullList):
             fullList.remove(i)
     sortedList = sorted(fullList, key=lambda entity: entity.stats.speed, reverse=True)
     return sortedList
-
 def attackMenu(stdscr, key_scheme, PlayerController, hero : Hero, enemies : List[Enemy]):
+    global selected
     while True:
         if havePerished(enemies):
             break
         stdscr.clear()
-        stdscr.addstr(0, 0, f"=== {Hero.getName()}'s turn -- Attack! ===")
+        stdscr.addstr(0, 0, f"=== {hero.getName()}'s turn -- Attack! ===")
         for i, option in enumerate(attackOptions):
             prefix = "> " if i == selected else "  "
             stdscr.addstr(i + 1, 0, f"{prefix}{option}")
@@ -109,26 +109,28 @@ def attackMenu(stdscr, key_scheme, PlayerController, hero : Hero, enemies : List
             break
 
     stdscr.clear()
-    if selected==3:
-        enemies[random(0, enemies.count())].takeDamage(hero.attack())
+    if selected == 3:
+        enemies[random.randint(0, len(enemies) - 1)].takeDamage(hero.attack())
 
-    elif selected==2:
+    elif selected == 2:
         stdscr.addstr(0, 0, f"Heavy Selected, now is last choice")
         hero.heroStats.attackStrategy = HeavyAttack()
-        enemies[random(0, enemies.count())].takeDamage(hero.attack())
+        enemies[random.randint(0, len(enemies) - 1)].takeDamage(hero.attack(stdscr))
 
-    elif selected==1:
+    elif selected == 1:
         stdscr.addstr(0, 0, f"Mid")
         hero.heroStats.attackStrategy = MidAttack()
-        enemies[random(0, enemies.count())].takeDamage(hero.attack())
+        enemies[random.randint(0, len(enemies) - 1)].takeDamage(hero.attack(stdscr))
 
-    elif selected==0:
+    elif selected == 0:
         stdscr.addstr(0, 0, f"Light")
         hero.heroStats.attackStrategy = LightAttack()
-        enemies[random(0, enemies.count())].takeDamage(hero.attack())
+        enemies[random.randint(0, len(enemies) - 1)].takeDamage(hero.attack(stdscr))
 
+    hero.takeDamage(enemies[random.randint(0,len(enemies))].attack(stdscr))
     stdscr.refresh()
     stdscr.getch()
+
 
 def story(stdscr, key_scheme, PlayerController, fullList):
     #! part 1
@@ -142,21 +144,19 @@ def story(stdscr, key_scheme, PlayerController, fullList):
     stdscr.addstr(0, 0, "Your first encounter is: ")
     startEncounters(fullList)
     for i in range(0, 100):
-        attackMenu(stdscr, key_scheme, PlayerController, party[turns[i % turns.count]])
+        attackMenu(stdscr, key_scheme, PlayerController, party[i % len(party)], fullList)
+        
 
     stdscr.clear()
     stdscr.addstr(0, 0, "Sadly this game isnt't finished")
-        
+
 
 def game(stdscr, key_scheme, PlayerController):
     curses.curs_set(0)
     stdscr.nodelay(False)
     stdscr.keypad(True)
-    stdscr.addstr(0, 0, "_____Defeat the evil John Evil_____")
     enemies = shallowGoblins + deepOrcs
     fullList = enemies + party
-    while enemies in fullList:
+    while any(hasattr(e, 'stats') and e.stats.hp > 0 for e in enemies): #! its reading hp as tuple???
         story(stdscr, key_scheme, PlayerController, fullList)
         stdscr.clear()
-
-    
